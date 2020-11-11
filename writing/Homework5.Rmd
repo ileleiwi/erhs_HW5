@@ -4,3 +4,18 @@ author: "Ikaia Leleiwi"
 date: "11/11/2020"
 output: pdf_document
 ---
+#### Global Options: 
+```{r  global_options}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, include = TRUE)
+```
+
+#### Packages: 
+```{r libraries}
+library(tidyverse)
+```
+
+#### Data:
+```{r, data}
+homicides <- read_csv("../data/homicide-data.csv")
+```
+
