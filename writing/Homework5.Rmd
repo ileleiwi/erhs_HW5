@@ -27,9 +27,8 @@ homicides_clean <- homicides %>%
          month = month(reported_date, label = TRUE),
          year = year(reported_date),
          month_year = paste(month, year, sep = " "),
-         season = case_when(month %in% c("Mar", "Apr", "May", 
-                                         "Jun", "Jul", "Aug") ~ "Summer",
-                            month %in% c("Jan", "Feb", "Sep",
+         season = case_when(month %in% c("Jun", "Jul", "Aug","Sep") ~ "Summer",
+                            month %in% c("Jan", "Feb", "Mar", "Apr", "May",
                                          "Oct", "Nov", "Dec") ~ "Winter",
                             TRUE ~ "other")) %>%
   group_by(month_year, season) %>%
