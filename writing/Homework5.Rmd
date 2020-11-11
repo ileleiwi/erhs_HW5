@@ -26,13 +26,52 @@ homicides_clean <- homicides %>%
          reported_date = ymd(reported_date),
          month = month(reported_date, label = TRUE),
          year = year(reported_date),
-         colors = case_when(month %in% c("Mar", "Apr", "May", 
-                                         "Jun", "Jul", "Aug") ~ "gray68",
+         month_year = paste(month, year, sep = " "),
+         season = case_when(month %in% c("Mar", "Apr", "May", 
+                                         "Jun", "Jul", "Aug") ~ "Summer",
                             month %in% c("Jan", "Feb", "Sep",
-                                         "Oct", "Nov", "Dec") ~ "lightblue1",
+                                         "Oct", "Nov", "Dec") ~ "Winter",
                             TRUE ~ "other")) %>%
-  group_by(month, year) %>%
+  group_by(month_year, season) %>%
   count() %>%
-  ungroup()
+  ungroup() %>%
+  separate(month_year, into = c("month", "year"), sep = " ", remove = FALSE) %>%
+  mutate(month = factor(month, levels = c("Jan", "Feb", "Mar", "Apr", "May", 
+                                          "Jun", "Jul", "Aug", "Sep","Oct", 
+                                          "Nov", "Dec")),
+         year = factor(year),
+         month_year = factor(month_year)) %>%
+  group_by(year) %>%
+  arrange(month, .by_group = TRUE) %>%
+  ungroup() %>%
+  mutate(index = seq(1:nrow(.)),
+         month_year = fct_reorder(month_year, index))
+```
+
+#### Plot:
+```{r plot, fig.width=20, fig.height=5}
+pal = c("gray68", "lightblue1")
+
+homicides_clean %>%
+  ggplot(aes(x = month_year, y = n)) +
+  geom_col(aes(fill = season), color = "black", size = .2) +
+  expand_limits(x = c(-6, 138)) +
+  scale_fill_manual(values = pal) +
+  scale_x_discrete(breaks = c("Jan 2008", "Jan 2010", "Jan 2012", "Jan 2014",
+                                "Jan 2016", "Dec 2017"),
+                      labels = c("2008", "2010", "2012", "2014",
+                                 "2016", "2018")) +
+  labs(title = "Homicides in Baltimore, MD",
+       x = "Date",
+       y = "Monthly homicides") +
+  theme(axis.text.x = element_text(size = 12),
+        axis.title.x = element_text(size = 14),
+        panel.background = element_rect(fill = "gray35"),
+        panel.grid = element_line(color = "gray25", 
+                                  size = .1,
+                                  linetype = 1),
+        legend.position = "bottom",
+        legend.title = element_blank())
+
 ```
 
