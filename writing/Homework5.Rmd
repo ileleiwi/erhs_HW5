@@ -12,10 +12,27 @@ knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, include = T
 #### Packages: 
 ```{r libraries}
 library(tidyverse)
+library(lubridate)
 ```
 
 #### Data:
 ```{r, data}
 homicides <- read_csv("../data/homicide-data.csv")
+
+homicides_clean <- homicides %>%
+  filter(city == "Baltimore") %>%
+  unite("victim_name", victim_first, victim_last, sep = " ") %>%
+  mutate(victim_name = str_to_title(victim_name),
+         reported_date = ymd(reported_date),
+         month = month(reported_date, label = TRUE),
+         year = year(reported_date),
+         colors = case_when(month %in% c("Mar", "Apr", "May", 
+                                         "Jun", "Jul", "Aug") ~ "gray68",
+                            month %in% c("Jan", "Feb", "Sep",
+                                         "Oct", "Nov", "Dec") ~ "lightblue1",
+                            TRUE ~ "other")) %>%
+  group_by(month, year) %>%
+  count() %>%
+  ungroup()
 ```
 
