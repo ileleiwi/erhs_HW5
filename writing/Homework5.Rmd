@@ -62,7 +62,12 @@ pal = c("gray68", "lightblue1")
   geom_vline(xintercept = as.Date("2015-04-01"), 
              color = "red", linetype = 2, size = 2) +
   geom_smooth(method = "lm", formula = y ~ poly(x, 26), se = FALSE) +
-  geom_text() 
+  annotate("text", 
+           x = as.Date("2014-10-01"), 
+           y = 40, 
+           label = "       Arrest of\nFreddie Gray", 
+           color = "white", 
+           size = 4.5) +
   scale_fill_manual(values = pal) +
   labs(title = "Homicides in Baltimore, MD",
        x = "Date",
@@ -71,17 +76,12 @@ pal = c("gray68", "lightblue1")
         axis.title.x = element_text(size = 14),
         panel.background = element_rect(fill = "gray35"),
         panel.grid = element_line(color = "gray25",
-                                  size = .1,
+                                  size = .5,
                                   linetype = 1),
         legend.position = "bottom",
         legend.title = element_blank())
 
 ```
 
-```{r}
-homicides_clean_date %>%
-  ggplot() +
-  geom_point(aes(x = month_year, y = n)) +
-  geom_smooth(aes(x = month_year, y = n))
-```
+
 
