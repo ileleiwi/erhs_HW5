@@ -27,9 +27,10 @@ homicides_clean <- homicides %>%
          month = month(reported_date, label = TRUE),
          year = year(reported_date),
          month_year = paste(month, year, sep = " "),
-         season = case_when(month %in% c("Jun", "Jul", "Aug","Sep") ~ "Summer",
-                            month %in% c("Jan", "Feb", "Mar", "Apr", "May",
-                                         "Oct", "Nov", "Dec") ~ "Winter",
+         season = case_when(month %in% c("May", "Jun", "Jul", 
+                                         "Aug","Sep", "Oct") ~ "Summer",
+                            month %in% c("Nov", "Dec", "Jan", 
+                                         "Feb", "Mar", "Apr") ~ "Winter",
                             TRUE ~ "other")) %>%
   group_by(month_year, season) %>%
   count() %>%
@@ -44,33 +45,43 @@ homicides_clean <- homicides %>%
   arrange(month, .by_group = TRUE) %>%
   ungroup() %>%
   mutate(index = seq(1:nrow(.)),
-         month_year = fct_reorder(month_year, index))
+         month_year = fct_reorder(month_year, index),
+         month_year = str_c(month_year, rep(1, nrow(.)), sep = " "),
+         month_year = myd(month_year))
+       
+
 ```
 
 #### Plot:
-```{r plot, fig.width=20, fig.height=5}
+```{r plot, fig.width=15, fig.height=3.5}
 pal = c("gray68", "lightblue1")
 
-homicides_clean %>%
+ homicides_clean %>%
   ggplot(aes(x = month_year, y = n)) +
   geom_col(aes(fill = season), color = "black", size = .2) +
-  expand_limits(x = c(-6, 138)) +
+  geom_vline(xintercept = as.Date("2015-04-01"), 
+             color = "red", linetype = 2, size = 2) +
+  geom_smooth(method = "lm", formula = y ~ poly(x, 26), se = FALSE) +
+  geom_text() 
   scale_fill_manual(values = pal) +
-  scale_x_discrete(breaks = c("Jan 2008", "Jan 2010", "Jan 2012", "Jan 2014",
-                                "Jan 2016", "Dec 2017"),
-                      labels = c("2008", "2010", "2012", "2014",
-                                 "2016", "2018")) +
   labs(title = "Homicides in Baltimore, MD",
        x = "Date",
        y = "Monthly homicides") +
   theme(axis.text.x = element_text(size = 12),
         axis.title.x = element_text(size = 14),
         panel.background = element_rect(fill = "gray35"),
-        panel.grid = element_line(color = "gray25", 
+        panel.grid = element_line(color = "gray25",
                                   size = .1,
                                   linetype = 1),
         legend.position = "bottom",
         legend.title = element_blank())
 
+```
+
+```{r}
+homicides_clean_date %>%
+  ggplot() +
+  geom_point(aes(x = month_year, y = n)) +
+  geom_smooth(aes(x = month_year, y = n))
 ```
 
